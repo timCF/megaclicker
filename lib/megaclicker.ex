@@ -17,4 +17,8 @@ defmodule Megaclicker do
     opts = [strategy: :one_for_one, name: Megaclicker.Supervisor]
     Supervisor.start_link(children, opts)
   end
+
+	def range(stop, stop), do: stop
+	def range(start, stop) when (stop > start), do: (:random.uniform(stop - (start-1)) + (start-1))
+
 end

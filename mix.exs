@@ -4,7 +4,7 @@ defmodule Megaclicker.Mixfile do
   def project do
     [app: :megaclicker,
      version: "0.0.1",
-     elixir: "~> 1.1",
+     #elixir: "~> 1.1",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
@@ -18,7 +18,6 @@ defmodule Megaclicker.Mixfile do
 						:logger,
 						:silverb,
 						:webdriver,
-						:randomex,
 						:exutils
 					],
      mod: {Megaclicker, []}]
@@ -37,7 +36,6 @@ defmodule Megaclicker.Mixfile do
     [
 		{:silverb, github: "timCF/silverb"},
 		{:webdriver, github: "timCF/elixir-webdriver"},
-		{:randomex, github: "timCF/randomex"},
 		{:exutils, github: "timCF/exutils"}
 	]
   end
