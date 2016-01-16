@@ -18,7 +18,8 @@ defmodule Megaclicker.Mixfile do
 						:logger,
 						:silverb,
 						:webdriver,
-						:exutils
+						:exutils,
+						:maybe
 					],
      mod: {Megaclicker, []}]
   end
@@ -36,7 +37,8 @@ defmodule Megaclicker.Mixfile do
     [
 		{:silverb, github: "timCF/silverb"},
 		{:webdriver, github: "timCF/elixir-webdriver"},
-		{:exutils, github: "timCF/exutils"}
+		{:exutils, github: "timCF/exutils"},
+		{:maybe, github: "timCF/maybe"}
 	]
   end
 end
