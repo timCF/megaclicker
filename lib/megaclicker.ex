@@ -1,9 +1,19 @@
 defmodule Megaclicker do
-	use Silverb, [
-		{"@pg2_group", :clients},
-	]
+	use Silverb, [{"@pg2_group", :clients}]
 	use Application
 	require Exutils
+
+	defstruct	config: nil,
+				session: nil,
+				url: nil,
+				x_res: nil,
+				x_from: nil,
+				x_to: nil,
+				y_res: nil,
+				y_from: nil,
+				y_to: nil,
+				# get this on runtime
+				root_elem: nil
 
 	# See http://elixir-lang.org/docs/stable/elixir/Application.html
 	# for more information on OTP Applications
@@ -14,17 +24,17 @@ defmodule Megaclicker do
 		spawn_link(fn ->
 			:timer.sleep(1000)
 			try do
-				args = %{ttl: ttl, threads: threads} = parse_args(System.argv)
+				args = %{ttl: ttl} = parse_args(System.argv)
 				case run_childs(args) |> Exutils.try_catch do
 					:ok -> :timer.sleep(ttl * 1000)
 					error -> IO.puts("HALT, ERROR ON START THREADS #{inspect error}")
 				end
-				terminate_childs(threads)
 			catch
 				error -> IO.puts("HALT, RUNTIME ERROR #{inspect error}")
 			rescue
 				error -> IO.puts("HALT, RUNTIME ERROR #{inspect error}")
 			end
+			terminate_childs()
 			:erlang.halt
 		end)
 
@@ -51,22 +61,37 @@ defmodule Megaclicker do
 		parsed
 	end
 
-	defp run_childs(args) do
-		#
-		#	TODO
-		#
-		#children = Enum.map(1..2, fn(n) ->
-		#	this_id = String.to_atom("session_#{n}")
-		#	worker(Megaclicker.Worker, [%{	config: %WebDriver.Config{name: String.to_atom("browser_#{n}"), browser: :chrome},
-		#									session: this_id,
-		#									url: "http://another_cafe.inbet.cc/slots/bets_poker3x?fun"}], [id: this_id]) end)
-		:ok
+	defp run_childs(%{url: url, x_res: x_res, x_from: x_from, x_to: x_to, y_res: y_res, y_from: y_from, y_to: y_to, threads: threads}) do
+		Enum.each(1..threads, fn(n) ->
+			this_id = String.to_atom("session_#{n}")
+			%Megaclicker{
+				config: %WebDriver.Config{name: String.to_atom("browser_#{n}"), browser: :chrome},
+				session: this_id,
+				url: url,
+				x_res: x_res,
+				x_from: x_from,
+				x_to: x_to,
+				y_res: y_res,
+				y_from: y_from,
+				y_to: y_to
+			}
+			|> start_worker
+		end)
 	end
+	defp start_worker(args = %Megaclicker{session: session}), do: (:ok = :supervisor.start_child(Megaclicker.Supervisor, Supervisor.Spec.worker(Megaclicker.Worker, [args], [restart: :transient, id: session])) |> elem(0))
 
-	defp terminate_childs(threads) do
-		#
-		#	TODO
-		#
+	defp terminate_childs do
+		case 	:pg2.get_members(@pg2_group)
+				|> Stream.map(fn(thread) -> GenServer.call(thread, :force_exit, 60000) end)
+				|> Enum.filter(&(&1 != :ok)) do
+			[] -> :ok
+			some ->
+				IO.puts("ERROR while terminate workers #{inspect some}")
+				Enum.each(1..5, fn(_) ->
+					WebDriver.stop_all_browsers() |> Exutils.try_catch
+					:timer.sleep(100)
+				end)
+		end
 	end
 
 end
