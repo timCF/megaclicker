@@ -24,19 +24,19 @@ defmodule Megaclicker.Worker do
 	#
 
 	def start_link(args), do: GenServer.start_link(__MODULE__, args)
-	def init(args = %Megaclicker{config: config = %WebDriver.Config{name: browser}, session: session, url: url}) do
+	def init(args = %Megaclicker{config: config = %WebDriver.Config{name: browser}, session: session, url: url, x_res: x_res, y_res: y_res}) do
 		<<a::32,b::32,c::32>> = :crypto.rand_bytes(12)
 		_ = :random.seed(a,b,c)
 		_ = :pg2.join(@pg2_group, self)
 		_ = WebDriver.start_browser(config) |> retry
 		_ = WebDriver.start_session(browser, session) |> retry
 		{:ok, _} = WebDriver.Session.url(session, url) |> retry
-		{:ok, _} = WebDriver.Session.window_size(session, :current, 1024, 1024) |> retry
+		{:ok, _} = WebDriver.Session.window_size(session, :current, x_res, y_res) |> retry
 		{:ok, %Megaclicker{args | root_elem: WebDriver.Session.element(session, :tag, "body")}, @ttl}
 	end
 
-	def handle_info(:timeout, state = %Megaclicker{session: session, root_elem: root_elem}) do
-		{:ok, _} = WebDriver.Mouse.move_to(root_elem, Megaclicker.range(24,722), Megaclicker.range(287, 674)) |> retry
+	def handle_info(:timeout, state = %Megaclicker{session: session, root_elem: root_elem, x_from: x_from, x_to: x_to, y_from: y_from, y_to: y_to}) do
+		{:ok, _} = WebDriver.Mouse.move_to(root_elem, Megaclicker.range(x_from, x_to), Megaclicker.range(y_from, y_to)) |> retry
 		{:ok, _} = WebDriver.Mouse.click(session, :left) |> retry
 		{:noreply, state, @ttl}
 	end

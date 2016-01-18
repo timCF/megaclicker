@@ -85,13 +85,12 @@ defmodule Megaclicker do
 				|> Stream.map(fn(thread) -> GenServer.call(thread, :force_exit, 60000) end)
 				|> Enum.filter(&(&1 != :ok)) do
 			[] -> :ok
-			some ->
-				IO.puts("ERROR while terminate workers #{inspect some}")
-				Enum.each(1..5, fn(_) ->
-					WebDriver.stop_all_browsers() |> Exutils.try_catch
-					:timer.sleep(100)
-				end)
+			some -> IO.puts("ERROR while terminate workers #{inspect some}")
 		end
+		Enum.each(1..5, fn(_) ->
+			WebDriver.stop_all_browsers() |> Exutils.try_catch
+			:timer.sleep(100)
+		end)
 	end
 
 end
