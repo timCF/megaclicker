@@ -17,4 +17,4 @@
   "relx": {:hex, :relx, "3.5.0"},
   "silverb": {:git, "https://github.com/timCF/silverb.git", "c13d12f8b2bc6a09075bb9b7ec140600e8d959ed", []},
   "uuid": {:git, "https://github.com/okeuday/uuid.git", "b2a42be011400bc182e5b0bb68cdc7e4084d13e7", []},
-  "webdriver": {:git, "https://github.com/timCF/elixir-webdriver.git", "2707de2eca1720951124dc813c0e0c2e732baed6", []}}
+  "webdriver": {:git, "https://github.com/timCF/elixir-webdriver.git", "dc506339bc9fa7992a343504469c02a0bc9e4473", []}}
