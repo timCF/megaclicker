@@ -2,9 +2,9 @@ os:
 - linux
 language: elixir
 elixir:
-- 1.2.2
+- 1.0.5
 otp_release:
-- 18.2.1
+- 17
 notifications:
   email: false
 script:
